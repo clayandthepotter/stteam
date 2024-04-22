@@ -18,7 +18,9 @@ export async function Navbar() {
 		<nav className='border-b bg-background h-[10vh] min-h-20 flex items-center'>
 			<div className='container flex items-center justify-between'>
 				<Link href='/'>
-					<h1 className='font-bold text-3xl'>Attendance Tracker</h1>
+					<h1 className='font-bold text-3xl tracking-tighter'>
+						STTEAM
+					</h1>
 				</Link>
 				<div className='flex items center gap-x-3'>
 					<ThemeToggle />
