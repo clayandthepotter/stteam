@@ -1,6 +1,14 @@
 'use client';
 
 import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@/components/ui/select';
+
+import {
 	Card,
 	CardContent,
 	CardDescription,
@@ -12,27 +20,21 @@ import { Button } from '@/components/ui/button';
 import { useAppContext } from '@/context/index';
 import { useEffect, useState } from 'react';
 import Clock from 'react-live-clock';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const Dashboard = () => {
 	const {
+		user,
+		userStatus,
+		setUserStatus,
 		isClockedIn,
 		setIsClockedIn,
 		isOnBreak,
 		setIsOnBreak,
 		dailyTimeLog,
 		setDailyTimeLog,
-		breakStartTime,
-		setBreakStartTime,
-		breakEndTime,
-		setBreakEndTime,
-		timerActive,
-		setTimerActive,
 		timerStart,
 		setTimerStart,
-		accumulatedTime,
-		setAccumulatedTime,
-		timerDisplay,
-		setTimerDisplay,
 		totalWorkTime,
 		setTotalWorkTime,
 		workTimer,
@@ -73,16 +75,18 @@ const Dashboard = () => {
 		// If on break, end break and resume work timer
 		const now = new Date().getTime();
 		if (isOnBreak) {
-			console.log();
+			console.log(breakTimer);
 			clearInterval(breakTimer);
+
 			const breakDuration = now - timerStart;
-			setTotalBreakTime(breakDuration + totalBreakTime);
+			setTotalBreakTime(totalBreakTime + breakDuration);
 			setIsOnBreak(false);
 			setDailyTimeLog((logs: any) => [
 				...logs,
 				`Break ended: ${new Date(now).toLocaleString()}`,
 				`You were inactive for: ${formatTime(breakDuration)}`,
 			]);
+			console.log(breakTimer);
 			// Resume work timer
 			setTimerStart(now); // reset start time for work
 			const newWorkTimer = setInterval(() => {
@@ -93,11 +97,11 @@ const Dashboard = () => {
 			// Start Break, stop work timer, log break start time
 			clearInterval(workTimer);
 			setIsOnBreak(true);
-			setTimerStart(now);
 			setDailyTimeLog((logs: any) => [
 				...logs,
 				`Break started: ${new Date(now).toLocaleString()}`,
 			]);
+			setTimerStart(now); // set start time for break
 			const newBreakTimer = setInterval(() => {
 				setTotalBreakTime((prev: any) => prev + 1000);
 			}, 1000);
@@ -105,47 +109,9 @@ const Dashboard = () => {
 		}
 	};
 
-	// const handleBreak = () => {
-	// 	const now = new Date();
-	// 	if (isOnBreak) {
-	// 		// Ending break: calculate duration, log end, and stop the timer
-	// 		const duration = now.getTime() - breakStartTime.getTime();
-	// 		const minutes = Math.floor(duration / 60000);
-	// 		const seconds = Math.floor((duration % 60000) / 1000);
-
-	// 		setIsOnBreak(false);
-	// 		setIsClockedIn(true);
-	// 		setBreakEndTime(now);
-	// 		setDailyTimeLog((logs: any) => [
-	// 			...logs,
-	// 			`Break ended: ${now.toLocaleString()}`,
-	// 			`Break duration: ${minutes} minutes and ${seconds} seconds`,
-	// 		]);
-	// 		setTimerStart(new Date().getTime());
-	// 		const newWorkTimer = setInterval(() => {
-	// 			const updatedTime = new Date().getTime() - now.getTime();
-	// 			setTotalWorkTime(updatedTime);
-	// 		}, 1000);
-	// 		setWorkTimer(newWorkTimer);
-	// 	} else {
-	// 		// Starting break: log start and initiate timer
-	// 		setIsOnBreak(true);
-	// 		setIsClockedIn(false);
-	// 		clearInterval(workTimer);
-	// 		setBreakStartTime(now);
-	// 		setDailyTimeLog((logs: any) => [
-	// 			...logs,
-	// 			`Break started: ${now.toLocaleString()}`,
-	// 		]);
-	// 		const newBreakTimer = setInterval(() => {
-	// 			const updatedTime = new Date().getTime() - now.getTime();
-	// 			setTotalBreakTime(updatedTime);
-	// 		}, 1000);
-	// 		setBreakTimer(newBreakTimer);
-	// 	}
-	// };
-
 	const handleClockInOut = () => {
+		// clock out logic
+		setUserStatus('Idle');
 		const now = new Date().getTime();
 		if (isClockedIn) {
 			clearInterval(workTimer);
@@ -157,6 +123,8 @@ const Dashboard = () => {
 				`Clocked out: ${new Date(now).toLocaleString()}`,
 			]);
 		} else {
+			// clock in logic
+			setUserStatus('Active');
 			setIsClockedIn(true);
 			setTimerStart(now);
 			const newWorkTimer = setInterval(() => {
@@ -170,52 +138,12 @@ const Dashboard = () => {
 		}
 	};
 
-	// const handleClockInOut = () => {
-	// 	const now = new Date();
-	// 	if (isClockedIn) {
-	// 		clearInterval(workTimer);
-	// 		const updatedWorkTime =
-	// 			Number(now) - Number(timerStart) + accumulatedTime;
-	// 		setAccumulatedTime((prev: any) => prev + updatedWorkTime);
-	// 		setIsClockedIn(false);
-	// 		setTimerStart(null);
-	// 		setTotalWorkTime((prev: any) => prev + updatedWorkTime);
-	// 		setDailyTimeLog((dailyTimeLog: any) => [
-	// 			...dailyTimeLog,
-	// 			`Clocked out:  ${new Date().toLocaleString()}`,
-	// 		]);
-	// 	} else {
-	// 		setIsClockedIn(true);
-	// 		clearInterval(breakTimer);
-	// 		setBreakEndTime(now);
-	// 		setDailyTimeLog((dailyTimeLog: any) => [
-	// 			...dailyTimeLog,
-	// 			`Clocked in:  ${new Date().toLocaleString()}`,
-	// 		]);
-	// 		setTimerStart(new Date().getTime());
-	// 		const newWorkTimer = setInterval(() => {
-	// 			const updatedTime = new Date().getTime() - now.getTime();
-	// 			setTotalWorkTime(updatedTime);
-	// 		}, 1000);
-	// 		setWorkTimer(newWorkTimer);
-	// 	}
-	// };
-
 	useEffect(() => {
 		return () => {
 			clearInterval(workTimer);
 			clearInterval(breakTimer);
 		};
 	}, [workTimer, breakTimer]);
-
-	// const formatTime = (time: any) => {
-	// 	const hours = Math.floor(time / 3600000);
-	// 	const mins = Math.floor((time % 3600000) / 60000);
-	// 	const secs = Math.floor(((time % 3600000) % 60000) / 1000);
-	// 	return `${hours.toString().padStart(2, '0')}:${mins
-	// 		.toString()
-	// 		.padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-	// };
 
 	const formatTime = (time: number) => {
 		const hours = Math.floor(time / 3600000);
@@ -226,6 +154,15 @@ const Dashboard = () => {
 			${secs.toString().padStart(2, '0')}`;
 	};
 
+	const userStatusOptions = [
+		'Active',
+		'On Break',
+		'Lunch Break',
+		'Meeting',
+		'Training',
+		'Focus',
+	];
+
 	return (
 		<div className='space-y-5'>
 			<section className='flex space-x-5'>
@@ -234,10 +171,10 @@ const Dashboard = () => {
 						<CardTitle>Daily Time Log</CardTitle>
 						<CardDescription>
 							{isClockedIn && !isOnBreak
-								? 'Clocked In - Active'
+								? `Clocked In - ${userStatus}`
 								: isClockedIn && isOnBreak
-								? 'On Break - Inactive'
-								: 'Clocked Out - Inactive'}
+								? `On Break - ${userStatus}`
+								: `Clocked Out - ${userStatus}`}
 						</CardDescription>
 					</CardHeader>
 					<CardContent className='space-x-2'>
@@ -283,7 +220,25 @@ const Dashboard = () => {
 							{breakButtonText}
 						</Button>
 					</CardContent>
-					<CardFooter></CardFooter>
+					<CardFooter>
+						<Select>
+							<SelectTrigger className='w-[180px]'>
+								<SelectValue placeholder='Select a Status:' />
+							</SelectTrigger>
+							<SelectContent>
+								{userStatusOptions.map((item, index) => (
+									<SelectItem
+										key={index}
+										id={index.toString()}
+										value={item}
+										onClick={() => setUserStatus(item)}
+									>
+										{item}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</CardFooter>
 				</Card>
 			</section>
 			<section>

@@ -21,7 +21,7 @@ export default function Home() {
 							Track time, manage employees and generate reports all in
 							one place.
 							<br />
-							Managing a remote workforce just got and upgrade!
+							Managing a remote workforce just got an upgrade!
 						</p>
 						<div>
 							<RegisterLink>
