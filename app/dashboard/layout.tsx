@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { DashboardNav } from '@/components/dashboardNav';
 
-export default function DashboradLayout({
+export default function DashboardLayout({
 	children,
 }: {
 	children: ReactNode;
