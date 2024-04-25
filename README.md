@@ -1,6 +1,6 @@
-# The EMSaaS
+# Stteam
 
-The Employee Management System as a Service.
+Short for: Simple Time Tracking and Employee Management
 
 This full stack project under construction is for the the purposes of employee management, attendance, and time tracking. 
 
